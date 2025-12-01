@@ -1,6 +1,11 @@
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence"
              version="3.0">
     <persistence-unit name="turneroPU" transaction-type="RESOURCE_LOCAL"> <!-- Atentos con este dato -->
+        <!-- Indicar el provider -->
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <!-- Registrar explícitamente las entidades -->
+        <class>com.turnero.entities.Ciudadano</class>
+        <class>com.turnero.entities.Turno</class>
         <properties>
             <!-- Configuración de la base de datos -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
