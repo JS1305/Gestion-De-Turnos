@@ -1,41 +1,67 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.example</groupId>
-  <artifactId>GestionTurnos</artifactId>
-  <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>GestionTurnos Maven Webapp</name>
-  <url>http://maven.apache.org</url>
-  <dependencies>
-      <!--JPA-->
-      <dependency>
-          <groupId>jakarta.persistence</groupId>
-          <artifactId>jakarta.persistence-api</artifactId>
-          <version>3.1.0</version>
-      </dependency>
-      <!--Hibernate-->
-      <dependency>
-          <groupId>org.hibernate.orm</groupId>
-          <artifactId>hibernate-core</artifactId>
-          <version>6.6.26.Final</version>
-      </dependency>
-      <!--mySql-->
-      <dependency>
-          <groupId>com.mysql</groupId>
-          <artifactId>mysql-connector-j</artifactId>
-          <version>9.4.0</version>
-      </dependency>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-      <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
-      <dependency>
-          <groupId>org.mariadb.jdbc</groupId>
-          <artifactId>mariadb-java-client</artifactId>
-          <version>3.5.6</version>
-      </dependency>
+    <groupId>org.example</groupId>
+    <artifactId>GestionTurnos</artifactId>
+    <packaging>war</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <name>GestionTurnos Maven Webapp</name>
+    <url>http://maven.apache.org</url>
 
-  </dependencies>
-  <build>
-    <finalName>GestionTurnos</finalName>
-  </build>
+    <!-- ✅ aquí marcamos la versión de Java con la que se compila el código -->
+    <properties>
+        <!-- El código se compila con nivel de lenguaje 22 (estable).
+             El JDK que usas puede ser el 25, no pasa nada. -->
+        <maven.compiler.source>22</maven.compiler.source>
+        <maven.compiler.target>22</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <!--JPA-->
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
+        <!--Hibernate-->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.6.26.Final</version>
+        </dependency>
+
+        <!--MySQL-->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>9.4.0</version>
+        </dependency>
+
+        <!-- MariaDB (si no lo usas, puedes quitarlo) -->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.5.6</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>GestionTurnos</finalName>
+
+        <!-- ✅ Plugin de compilación usando release 22 -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <!-- Compila el código como Java 22,
+                         usando el JDK que tengas configurado (en tu caso, el 25) -->
+                    <release>22</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
