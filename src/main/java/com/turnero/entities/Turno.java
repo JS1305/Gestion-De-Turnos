@@ -2,34 +2,34 @@ package com.turnero.entities;
 
 import jakarta.persistence.*;
 
-@Entity
-public class Turno {
+import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "turno")
+public class Turno {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private int identificador; // Progresivo generado en TurnoService
-    private String estado;     // "En espera" / "Ya atendido"
+    @Column(nullable = false)
+    private int identificador;
+    @Column(nullable = false)
+    private String estado;
+    @Column(nullable = false)
     private String descripcion;
+    @Column(nullable = false)
     private String fecha;
-
-    // Relación con Ciudadano
-    @ManyToOne
-    @JoinColumn(name = "ciudadano_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ciudadano_id", nullable = false)
     private Ciudadano ciudadano;
-
-    // Constructores
     public Turno() {}
-
-    public Turno(String estado, String descripcion, String fecha, Ciudadano ciudadano) {
+    public Turno(int identificador, String estado, String descripcion, String fecha, Ciudadano ciudadano) {
+        this.identificador = identificador;
         this.estado = estado;
         this.descripcion = descripcion;
         this.fecha = fecha;
         this.ciudadano = ciudadano;
     }
-
-    // Getters y setters
     public Long getId() { return id; }
     public int getIdentificador() { return identificador; }
     public void setIdentificador(int identificador) { this.identificador = identificador; }
@@ -41,16 +41,10 @@ public class Turno {
     public void setFecha(String fecha) { this.fecha = fecha; }
     public Ciudadano getCiudadano() { return ciudadano; }
     public void setCiudadano(Ciudadano ciudadano) { this.ciudadano = ciudadano; }
-
     @Override
     public String toString() {
-        return "Turno{" +
-                "id=" + id +
-                ", identificador=" + identificador +
-                ", estado='" + estado + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", fecha='" + fecha + '\'' +
-                ", ciudadano=" + ciudadano +
-                '}';
+        return "Turno{id=" + id + ", identificador=" + identificador +
+                ", estado='" + estado + "', descripcion='" + descripcion +
+                "', fecha='" + fecha + "', ciudadano=" + (ciudadano != null ? ciudadano.getId() : null) + "}";
     }
 }
