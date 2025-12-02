@@ -27,6 +27,8 @@ public class Ciudadano {
     }
 
     // Getters y setters
+
+    public void setId(Long id) {this.id = id;}
     public Long getId() { return id; }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -54,4 +56,6 @@ public class Ciudadano {
                 ", turnos=" + turnos +
                 '}';
     }
+
+
 }
