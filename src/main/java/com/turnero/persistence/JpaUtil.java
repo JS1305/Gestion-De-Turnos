@@ -1,4 +1,4 @@
-package com.turnero.persistece;
+package com.turnero.persistence;
 
 import jakarta.persistence.*;
 

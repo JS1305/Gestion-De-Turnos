@@ -1,6 +1,6 @@
 package com.turnero.pruebas;
 
-import com.turnero.persistece.JpaUtil;
+import com.turnero.persistence.JpaUtil;
 
 public class TestBD {
     public static void main(String[] args) {
