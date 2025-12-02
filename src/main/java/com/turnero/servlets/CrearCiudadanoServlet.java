@@ -2,6 +2,7 @@ package com.turnero.servlets;
 
 import com.turnero.entities.Ciudadano;
 import com.turnero.persistence.JpaUtil;
+import com.turnero.services.CiudadanoService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -29,28 +30,17 @@ public class CrearCiudadanoServlet extends HttpServlet {
             return;
         }
 
-        EntityManager em = JpaUtil.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
-
+        //Recibir datos formulario de registro de ciudadano
+        // y llama CiudadanoService para guardarlos
+        CiudadanoService service = new CiudadanoService();
         try {
-            tx.begin();
-
             Ciudadano ciudadano = new Ciudadano(nombre, dni);
-            em.persist(ciudadano);
-
-            tx.commit();
-
-            // Redirección con mensaje de éxito (GET)
+            service.crearCiudadano(ciudadano); // Guardamos usando el servicio
             response.sendRedirect("registroCiudadano.jsp?success=true");
-
         } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-
             request.setAttribute("error", "Error al registrar ciudadano: " + e.getMessage());
             request.getRequestDispatcher("registroCiudadano.jsp").forward(request, response);
-
-        } finally {
-            em.close();
         }
+
     }
 }

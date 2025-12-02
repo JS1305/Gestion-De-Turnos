@@ -19,14 +19,13 @@ public class CrearTurnoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Recoger datos
-        int identificador = Integer.parseInt(request.getParameter("identificador"));
         String estado = request.getParameter("estado");
         String descripcion = request.getParameter("descripcion");
         String fecha = request.getParameter("fecha");
         int ciudadano_id = Integer.parseInt(request.getParameter("ciudadano_id"));
 
         // Validar campos
-        if (identificador <= 0 ||estado == null || estado.isBlank() || descripcion == null || descripcion.isBlank() ||
+        if (estado == null || estado.isBlank() || descripcion == null || descripcion.isBlank() ||
                 fecha == null || fecha.isBlank() || ciudadano_id <= 0) {
             request.setAttribute("error", "Todos los campos son obligatorios.");
             request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
@@ -38,9 +37,20 @@ public class CrearTurnoServlet extends HttpServlet {
 
         try {
             tx.begin();
-            Ciudadano ciudadano = new Ciudadano();
-            ciudadano.setId((long) ciudadano_id);
-            Turno turno = new Turno(identificador, estado, descripcion, fecha, ciudadano);
+
+            // Obtener el nuevo identificador (Stream y lambda)
+            int nuevoIdentificador = em.createQuery("SELECT t.identificador FROM Turno t", Integer.class)
+                    .getResultStream()
+                    .max(Integer::compareTo)
+                    .orElse(0) + 1;
+
+            // Obtener ciudadano desde la BD
+            Ciudadano ciudadano = em.find(Ciudadano.class, (long) ciudadano_id);
+            if (ciudadano == null) {
+                throw new IllegalArgumentException("Ciudadano no encontrado con ID: " + ciudadano_id);
+            }
+
+            Turno turno = new Turno(nuevoIdentificador, estado, descripcion, fecha, ciudadano);
             em.persist(turno);
 
             tx.commit();
