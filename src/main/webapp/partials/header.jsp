@@ -5,6 +5,6 @@
         <a href="index.jsp">Inicio</a>
         <a href="registroCiudadano.jsp">Registro de ciudadano</a>
         <a href="registroTurno.jsp">Registro de turno</a>
-        <a href="#">Listado de turnos</a>
+        <a href="listar-turnos">Listado de turnos</a>
     </nav>
 </header>
