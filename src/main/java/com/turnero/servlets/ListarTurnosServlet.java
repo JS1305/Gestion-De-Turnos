@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 @WebServlet("/listar-turnos")
@@ -20,10 +21,14 @@ public class ListarTurnosServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<Turno> listaTurnos = turnoService.obtenerTodos();
+        //Obtener turnos de DB
+        List<Turno> listaTurnos = turnoService.obtenerTodos()
+                .stream()
+                //Ordenar turnos por identificador
+                .sorted(Comparator.comparing(Turno::getIdentificador))
+                .toList();
 
-        request.setAttribute("listaTurnos", listaTurnos);
-
+        request.setAttribute("turnos", listaTurnos);
         request.getRequestDispatcher("listarTurnos.jsp").forward(request, response);
 
     }

@@ -1,31 +1,30 @@
 package com.turnero.services;
 
 import com.turnero.entities.Turno;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Persistence;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TurnoService {
-    private List<Turno> turnos = new ArrayList<>();
+
+    private EntityManager em =
+            Persistence.createEntityManagerFactory("TurneroPU").createEntityManager();
 
     public Turno crearTurno(Turno turno) {
-        turnos.add(turno);
+        em.getTransaction().begin();
+        em.persist(turno);
+        em.getTransaction().commit();
         return turno;
     }
 
     public Turno obtenerTurno(Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        return turnos.stream()
-                .filter(t -> id.equals(t.getIdentificador()))
-                .findFirst()
-                .orElse(null);
+        return em.find(Turno.class, id);
     }
 
     public List<Turno> obtenerTodos() {
-        return new ArrayList<>(turnos);
+        return em.createQuery("SELECT t FROM Turno t", Turno.class)
+                .getResultList();
     }
 
     public Turno actualizarTurno(Long id, Turno turnoActualizado) {
@@ -35,19 +34,29 @@ public class TurnoService {
             return null;
         }
 
+        em.getTransaction().begin();
+
         turno.setEstado(turnoActualizado.getEstado());
         turno.setDescripcion(turnoActualizado.getDescripcion());
         turno.setFecha(turnoActualizado.getFecha());
         turno.setCiudadano(turnoActualizado.getCiudadano());
 
+        em.getTransaction().commit();
+
         return turno;
     }
 
     public boolean eliminarTurno(Long id) {
-        if (id == null){
+        Turno turno = obtenerTurno(id);
+
+        if (turno == null) {
             return false;
         }
 
-        return turnos.removeIf(t -> id.equals(t.getIdentificador()));
+        em.getTransaction().begin();
+        em.remove(turno);
+        em.getTransaction().commit();
+
+        return true;
     }
 }

@@ -4,20 +4,26 @@
 
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Listado de Turnos</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+<body>
 
-    <body>
+<!-- Header -->
+<%@ include file="partials/header.jsp" %>
 
-    <!-- Header -->
-    <%@ include file="partials/header.jsp" %>
-
-    <h2>Listado de Turnos</h2>
+<div class="container my-5">
+    <h2 class="mb-4">Listado de Turnos</h2>
 
     <% List<Turno> lista = (List<Turno>) request.getAttribute("listaTurnos"); %>
 
-    <table>
-        <thead>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
         <tr>
             <th>ID</th>
             <th>Estado</th>
@@ -29,8 +35,8 @@
 
         <tbody>
         <%
-        if (lista != null) {
-        for (Turno t : lista) {
+        if (lista != null && !lista.isEmpty()) {
+            for (Turno t : lista) {
         %>
         <tr>
             <td><%= t.getIdentificador() %></td>
@@ -40,20 +46,24 @@
             <td><%= t.getCiudadano().getId() %></td>
         </tr>
         <%
-        }
+            }
         } else {
         %>
         <tr>
-            <td colspan="5">No hay turnos para mostrar</td>
+            <td colspan="5" class="text-center">No hay turnos para mostrar</td>
         </tr>
         <%
         }
         %>
         </tbody>
     </table>
+</div>
 
-    <!-- Footer -->
-    <%@ include file="partials/footer.jsp" %>
+<!-- Footer -->
+<%@ include file="partials/footer.jsp" %>
 
-    </body>
+<!-- Bootstrap JS opcional -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
 </html>
