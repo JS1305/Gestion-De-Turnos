@@ -1,62 +1,26 @@
 package com.turnero.services;
 
 import com.turnero.entities.Turno;
+import com.turnero.persistence.JpaUtil;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Persistence;
-
 import java.util.List;
 
 public class TurnoService {
 
-    private EntityManager em =
-            Persistence.createEntityManagerFactory("TurneroPU").createEntityManager();
+    private final EntityManager em;
 
-    public Turno crearTurno(Turno turno) {
-        em.getTransaction().begin();
-        em.persist(turno);
-        em.getTransaction().commit();
-        return turno;
+    public TurnoService() {
+        this.em = JpaUtil.getEntityManager();
     }
 
-    public Turno obtenerTurno(Long id) {
-        return em.find(Turno.class, id);
-    }
-
+    // Obtener todos los turnos ordenados por identificador
     public List<Turno> obtenerTodos() {
-        return em.createQuery("SELECT t FROM Turno t", Turno.class)
+        return em.createQuery("SELECT t FROM Turno t ORDER BY t.identificador", Turno.class)
                 .getResultList();
     }
 
-    public Turno actualizarTurno(Long id, Turno turnoActualizado) {
-        Turno turno = obtenerTurno(id);
-
-        if (turno == null) {
-            return null;
-        }
-
-        em.getTransaction().begin();
-
-        turno.setEstado(turnoActualizado.getEstado());
-        turno.setDescripcion(turnoActualizado.getDescripcion());
-        turno.setFecha(turnoActualizado.getFecha());
-        turno.setCiudadano(turnoActualizado.getCiudadano());
-
-        em.getTransaction().commit();
-
-        return turno;
-    }
-
-    public boolean eliminarTurno(Long id) {
-        Turno turno = obtenerTurno(id);
-
-        if (turno == null) {
-            return false;
-        }
-
-        em.getTransaction().begin();
-        em.remove(turno);
-        em.getTransaction().commit();
-
-        return true;
+    // Cerrar EntityManager
+    public void cerrar() {
+        if (em.isOpen()) em.close();
     }
 }

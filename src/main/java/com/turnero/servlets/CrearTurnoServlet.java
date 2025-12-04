@@ -18,7 +18,8 @@ public class CrearTurnoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Recoger datos
+
+        // Recoger datos del formulario
         String estado = request.getParameter("estado");
         String descripcion = request.getParameter("descripcion");
         String fecha = request.getParameter("fecha");
@@ -38,25 +39,26 @@ public class CrearTurnoServlet extends HttpServlet {
         try {
             tx.begin();
 
-            // Obtener el nuevo identificador (Stream y lambda)
+            // Generar automáticamente el nuevo identificador
             int nuevoIdentificador = em.createQuery("SELECT t.identificador FROM Turno t", Integer.class)
                     .getResultStream()
                     .max(Integer::compareTo)
                     .orElse(0) + 1;
 
-            // Obtener ciudadano desde la BD
+            // Obtener ciudadano desde la base de datos
             Ciudadano ciudadano = em.find(Ciudadano.class, (long) ciudadano_id);
             if (ciudadano == null) {
                 throw new IllegalArgumentException("Ciudadano no encontrado con ID: " + ciudadano_id);
             }
 
+            // Crear y persistir el turno
             Turno turno = new Turno(nuevoIdentificador, estado, descripcion, fecha, ciudadano);
             em.persist(turno);
 
             tx.commit();
 
-            // Redirección con mensaje de éxito (GET)
-            response.sendRedirect("registroTurno.jsp?success=true");
+            // Redirección con mensaje de éxito y número de turno
+            response.sendRedirect("registroTurno.jsp?success=true&id=" + nuevoIdentificador);
 
         } catch (Exception e) {
             if (tx.isActive()) tx.rollback();
