@@ -9,10 +9,8 @@
     <name>GestionTurnos Maven Webapp</name>
     <url>http://maven.apache.org</url>
 
-    <!-- ✅ aquí marcamos la versión de Java con la que se compila el código -->
+    <!-- aquí se marca la versión de Java con la que se compila el código -->
     <properties>
-        <!-- El código se compila con nivel de lenguaje 22 (estable).
-             El JDK que usas puede ser el 25, no pasa nada. -->
         <maven.compiler.source>22</maven.compiler.source>
         <maven.compiler.target>22</maven.compiler.target>
     </properties>
@@ -40,31 +38,24 @@
             <version>9.4.0</version>
         </dependency>
 
-        <!-- MariaDB (si no lo usas, puedes quitarlo) -->
+        <!-- MariaDB  -->
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>3.5.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>GestionTurnos</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
     <build>
         <finalName>GestionTurnos</finalName>
 
-        <!-- ✅ Plugin de compilación usando release 22 -->
+        <!--  Plugin de compilación usando release 22 -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <!-- Compila el código como Java 22,
-                         usando el JDK que tengas configurado (en tu caso, el 25) -->
                     <release>22</release>
                 </configuration>
             </plugin>
