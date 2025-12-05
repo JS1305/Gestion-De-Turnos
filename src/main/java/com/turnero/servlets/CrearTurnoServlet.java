@@ -2,70 +2,72 @@ package com.turnero.servlets;
 
 import com.turnero.entities.Ciudadano;
 import com.turnero.entities.Turno;
-import com.turnero.persistence.JpaUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
+import com.turnero.services.CiudadanoService;
+import com.turnero.services.TurnoService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 
 @WebServlet("/registrar-turno")
 public class CrearTurnoServlet extends HttpServlet {
 
+    private CiudadanoService ciudadanoService = new CiudadanoService();
+    private TurnoService turnoService = new TurnoService();
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Recoger datos
-        String estado = request.getParameter("estado");
-        String descripcion = request.getParameter("descripcion");
-        String fecha = request.getParameter("fecha");
-        int ciudadano_id = Integer.parseInt(request.getParameter("ciudadano_id"));
-
-        // Validar campos
-        if (estado == null || estado.isBlank() || descripcion == null || descripcion.isBlank() ||
-                fecha == null || fecha.isBlank() || ciudadano_id <= 0) {
-            request.setAttribute("error", "Todos los campos son obligatorios.");
-            request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
-            return;
-        }
-
-        EntityManager em = JpaUtil.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
 
         try {
-            tx.begin();
+            // --- Obtener parámetros ---
+            String estado = request.getParameter("estado");
+            String descripcion = request.getParameter("descripcion");
+            String fecha = request.getParameter("fecha");
+            Long ciudadanoId = Long.parseLong(request.getParameter("ciudadano_id"));
 
-            // Obtener el nuevo identificador (Stream y lambda)
-            int nuevoIdentificador = em.createQuery("SELECT t.identificador FROM Turno t", Integer.class)
-                    .getResultStream()
-                    .max(Integer::compareTo)
-                    .orElse(0) + 1;
-
-            // Obtener ciudadano desde la BD
-            Ciudadano ciudadano = em.find(Ciudadano.class, (long) ciudadano_id);
-            if (ciudadano == null) {
-                throw new IllegalArgumentException("Ciudadano no encontrado con ID: " + ciudadano_id);
+            // --- Validaciones ---
+            if (estado == null || fecha == null || ciudadanoId == null) {
+                request.setAttribute("error", "Los campos obligatorios no fueron enviados.");
+                request.getRequestDispatcher("form-turno").forward(request, response);
+                return;
             }
 
-            Turno turno = new Turno(nuevoIdentificador, estado, descripcion, fecha, ciudadano);
-            em.persist(turno);
+            // --- Obtener ciudadano ---
+            Ciudadano ciudadano = ciudadanoService.obtenerCiudadano(ciudadanoId);
 
-            tx.commit();
+            if (ciudadano == null) {
+                request.setAttribute("error", "El ciudadano seleccionado no existe.");
+                request.getRequestDispatcher("form-turno").forward(request, response);
+                return;
+            }
 
-            // Redirección con mensaje de éxito (GET)
-            response.sendRedirect("registroTurno.jsp?success=true");
+            // --- Generar identificador automático ---
+            int identificador = turnoService.generarNuevoIdentificador();
+
+            // --- Crear turno ---
+            Turno nuevoTurno = new Turno(
+                    identificador,
+                    estado,
+                    descripcion,
+                    fecha,
+                    ciudadano
+            );
+
+            turnoService.crearTurno(nuevoTurno);
+
+            // --- Redirigir con éxito ---
+            response.sendRedirect("form-turno?success=true");
 
         } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
 
+            // Cualquier error inesperado
+            e.printStackTrace();
             request.setAttribute("error", "Error al registrar el turno: " + e.getMessage());
-            request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
-
-        } finally {
-            em.close();
+            request.getRequestDispatcher("form-turno").forward(request, response);
         }
     }
 }

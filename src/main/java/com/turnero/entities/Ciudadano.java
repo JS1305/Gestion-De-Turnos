@@ -15,7 +15,12 @@ public class Ciudadano {
     private String dni;
 
     // Relación con Turnos
-    @OneToMany(mappedBy = "ciudadano", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "ciudadano",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.EAGER
+    )
     private List<Turno> turnos = new ArrayList<>();
 
     // Constructores

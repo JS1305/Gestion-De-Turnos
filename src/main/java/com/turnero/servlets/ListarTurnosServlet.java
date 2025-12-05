@@ -21,15 +21,16 @@ public class ListarTurnosServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        //Obtener turnos de DB
+        // Obtener turnos desde la BD y ordenarlos
         List<Turno> listaTurnos = turnoService.obtenerTodos()
                 .stream()
-                //Ordenar turnos por identificador
                 .sorted(Comparator.comparing(Turno::getIdentificador))
                 .toList();
 
-        request.setAttribute("turnos", listaTurnos);
-        request.getRequestDispatcher("listarTurnos.jsp").forward(request, response);
+        // Atributo correcto
+        request.setAttribute("listaTurnos", listaTurnos);
 
+        // Enviar a JSP
+        request.getRequestDispatcher("listarTurnos.jsp").forward(request, response);
     }
 }
