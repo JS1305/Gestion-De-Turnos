@@ -17,13 +17,16 @@ public class ListarTurnosServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        TurnoService servicio = new TurnoService();
-        try {
-            List<Turno> turnos = servicio.obtenerTodos();
-            request.setAttribute("listaTurnos", turnos);
-            request.getRequestDispatcher("/listarTurnos.jsp").forward(request, response);
-        } finally {
-            servicio.cerrar();
-        }
+        // Obtener turnos desde la BD y ordenarlos
+        List<Turno> listaTurnos = turnoService.obtenerTodos()
+                .stream()
+                .sorted(Comparator.comparing(Turno::getIdentificador))
+                .toList();
+
+        // Atributo correcto
+        request.setAttribute("listaTurnos", listaTurnos);
+
+        // Enviar a JSP
+        request.getRequestDispatcher("listarTurnos.jsp").forward(request, response);
     }
 }

@@ -2,27 +2,19 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Página Principal</title>
-
-    <!-- Bootstrap CSS -->
+    <title>Inicio</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- CSS propio -->
-    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
-<!-- Header -->
 <%@ include file="partials/header.jsp" %>
 
-<main class="container my-5">
-    <h2 class="text-center">Página Principal</h2>
-    <p class="text-center">Bienvenido al sistema de gestión de turnos.</p>
-</main>
+<div class="container my-5">
+    <h2>Bienvenido al Sistema de Gestión de Turnos</h2>
+    <p class="lead">Utilice el menú superior para navegar entre las funciones del sistema.</p>
+</div>
 
-<!-- Footer -->
 <%@ include file="partials/footer.jsp" %>
 
-<!-- Bootstrap JS opcional -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

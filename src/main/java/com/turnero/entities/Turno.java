@@ -19,7 +19,7 @@ public class Turno {
     private String descripcion;
     @Column(nullable = false)
     private String fecha;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ciudadano_id", nullable = false)
     private Ciudadano ciudadano;
     public Turno() {}
