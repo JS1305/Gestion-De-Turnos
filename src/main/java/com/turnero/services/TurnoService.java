@@ -80,6 +80,30 @@ public class TurnoService {
         }
     }
 
+    // Actualizar estado de un turno
+    public Turno actualizarEstado(Long id, String estado){
+        EntityManager em = JpaUtil.getEntityManager();
+        EntityTransaction tx = em.getTransaction();
+        try {
+            tx.begin();
+
+            Turno turno = em.find(Turno.class, id);
+            if (turno == null) return null;
+
+            turno.setEstado(estado);
+
+            tx.commit();
+            return turno;
+
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
+
+        } finally {
+            em.close();
+        }
+    }
+
     // Eliminar un turno
     public boolean eliminarTurno(Long id) {
         EntityManager em = JpaUtil.getEntityManager();
