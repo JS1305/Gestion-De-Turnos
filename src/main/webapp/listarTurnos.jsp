@@ -30,7 +30,6 @@
             <th>ID Ciudadano</th>
         </tr>
         </thead>
-
         <tbody>
         <% if (lista != null && !lista.isEmpty()) {
         for (Turno t : lista) { %>
