@@ -18,7 +18,7 @@ public class ListarTurnosServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        //Verificar estado
         // Obtener turnos desde la BD y ordenarlos
         List<Turno> listaTurnos = turnoService.obtenerTodos()
                 .stream()
