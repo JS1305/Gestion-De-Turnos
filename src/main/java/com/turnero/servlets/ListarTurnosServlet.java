@@ -11,14 +11,14 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
-@WebServlet("/listaTurnos")
+@WebServlet("/listar-Turnos")
 public class ListarTurnosServlet extends HttpServlet {
 
     private TurnoService turnoService = new TurnoService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //Verificar estado
+
         // Obtener turnos desde la BD y ordenarlos
         List<Turno> listaTurnos = turnoService.obtenerTodos()
                 .stream()
