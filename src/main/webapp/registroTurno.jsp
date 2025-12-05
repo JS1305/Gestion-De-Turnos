@@ -21,14 +21,20 @@
     String success = request.getParameter("success");
     String error = (String) request.getAttribute("error");
     List<Ciudadano> lista = (List<Ciudadano>) request.getAttribute("listaCiudadanos");
+    String idTurno = request.getParameter("id");
     %>
 
     <% if ("true".equals(success)) { %>
-    <div class="alert alert-success">Turno registrado correctamente.</div>
+        <div class="alert alert-success">
+            Turno registrado correctamente.
+            <% if (idTurno != null) { %>
+                <br>📌 ID del turno generado: <strong><%= idTurno %></strong>
+            <% } %>
+        </div>
     <% } %>
 
     <% if (error != null) { %>
-    <div class="alert alert-danger"><%= error %></div>
+        <div class="alert alert-danger"><%= error %></div>
     <% } %>
 
     <form action="registrar-turno" method="post" class="card p-4 shadow">
@@ -37,9 +43,8 @@
         <div class="mb-3">
             <label class="form-label">Estado</label>
             <select name="estado" class="form-select" required>
-                <option value="pendiente">Pendiente</option>
-                <option value="completado">Completado</option>
-                <option value="cancelado">Cancelado</option>
+                <option value="En espera">En espera</option>
+                <option value="Ya atendido">Ya atendido</option>
             </select>
         </div>
 
@@ -52,7 +57,7 @@
         <!-- Fecha -->
         <div class="mb-3">
             <label class="form-label">Fecha</label>
-            <input type="date" name="fecha" class="form-control" required>
+            <input type="date" name="fecha" class="form-control" required min="<%= java.time.LocalDate.now() %>">
         </div>
 
         <!-- Ciudadano -->

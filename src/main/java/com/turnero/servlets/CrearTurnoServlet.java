@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @WebServlet("/registrar-turno")
 public class CrearTurnoServlet extends HttpServlet {
@@ -29,12 +31,31 @@ public class CrearTurnoServlet extends HttpServlet {
             String fecha = request.getParameter("fecha");
             Long ciudadanoId = Long.parseLong(request.getParameter("ciudadano_id"));
 
-            // --- Validaciones ---
+            // --- Validación de fecha ---
+            LocalDate fechaTurno;
+
+            try {
+                fechaTurno = LocalDate.parse(fecha); // formato yyyy-MM-dd
+            } catch (DateTimeParseException e) {
+                request.setAttribute("error", "La fecha ingresada no es válida.");
+                request.getRequestDispatcher("form-turno").forward(request, response);
+                return;
+            }
+
+            // No permitir fechas pasadas
+            LocalDate hoy = LocalDate.now();
+
+            if (fechaTurno.isBefore(hoy)) {
+                request.setAttribute("error", "La fecha no puede ser anterior a la actual.");
+                request.getRequestDispatcher("form-turno").forward(request, response);
+                return;
+            }
+            /* --- Validaciones ---
             if (estado == null || fecha == null || ciudadanoId == null) {
                 request.setAttribute("error", "Los campos obligatorios no fueron enviados.");
                 request.getRequestDispatcher("form-turno").forward(request, response);
                 return;
-            }
+            }*/
 
             // --- Obtener ciudadano ---
             Ciudadano ciudadano = ciudadanoService.obtenerCiudadano(ciudadanoId);
@@ -53,14 +74,14 @@ public class CrearTurnoServlet extends HttpServlet {
                     identificador,
                     estado,
                     descripcion,
-                    fecha,
+                    fechaTurno.toString(),
                     ciudadano
             );
 
             turnoService.crearTurno(nuevoTurno);
-
-            // --- Redirigir con éxito ---
-            response.sendRedirect("form-turno?success=true");
+            Long turnoId = nuevoTurno.getId();
+            String contextPath = request.getContextPath();  // ej: /GestionTurnos
+            response.sendRedirect(contextPath + "/form-turno?success=true&id=" + turnoId);
 
         } catch (Exception e) {
 

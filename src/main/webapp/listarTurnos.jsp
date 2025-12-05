@@ -17,8 +17,33 @@
     <h2 class="mb-4">Listado de Turnos</h2>
 
     <%
+    String estadoFiltro = request.getParameter("estado");
+    String fechaFiltro = request.getParameter("fecha");
     List<Turno> lista = (List<Turno>) request.getAttribute("listaTurnos");
     %>
+
+    <!-- Filtros -->
+        <form class="row g-3 mb-4" method="get" action="listar-Turnos">
+            <div class="col-md-4">
+                <label for="estado" class="form-label">Estado</label>
+                <select id="estado" name="estado" class="form-select">
+                    <option value="" <%= (estadoFiltro == null || estadoFiltro.isBlank()) ? "selected" : "" %>>Todos</option>
+                    <option value="En espera" <%= "En espera".equals(estadoFiltro) ? "selected" : "" %>>En espera</option>
+                    <option value="Ya atendido" <%= "Ya atendido".equals(estadoFiltro) ? "selected" : "" %>>Ya atendido</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" id="fecha" name="fecha" class="form-control"
+                       value="<%= (fechaFiltro != null ? fechaFiltro : "") %>">
+            </div>
+
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                <a href="listar-Turnos" class="btn btn-secondary">Limpiar</a>
+            </div>
+        </form>
 
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
