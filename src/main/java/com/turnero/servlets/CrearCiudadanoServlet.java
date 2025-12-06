@@ -1,15 +1,12 @@
 package com.turnero.servlets;
 
 import com.turnero.entities.Ciudadano;
-import com.turnero.persistence.JpaUtil;
 import com.turnero.services.CiudadanoService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
 
 import java.io.IOException;
 

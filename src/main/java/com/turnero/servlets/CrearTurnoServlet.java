@@ -25,6 +25,7 @@ public class CrearTurnoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        //obtener parámetros formulario
         try {
             String estado = request.getParameter("estado");
             String descripcion = request.getParameter("descripcion");
@@ -47,6 +48,7 @@ public class CrearTurnoServlet extends HttpServlet {
 
             Long ciudadanoId = Long.parseLong(ciudadanoIdStr);
 
+            //verificar límite de turnos pendientes
             if (limiteTurnosSuperado(ciudadanoId)) {
                 mostrarError(request, response,
                         "Máximo 3 turnos en estado 'En espera' por ciudadano. " +
@@ -86,12 +88,14 @@ public class CrearTurnoServlet extends HttpServlet {
         }
     }
 
+    //mostrar errores en JSP
     private void mostrarError(HttpServletRequest request, HttpServletResponse response, String mensaje)
             throws ServletException, IOException {
         request.setAttribute("error", mensaje);
         request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
     }
 
+    //metodo auxiliar para validar si ID ciudadano es válido
     private boolean validarCiudadanoId(String ciudadanoIdStr) {
         try {
             Long.parseLong(ciudadanoIdStr);
@@ -101,6 +105,7 @@ public class CrearTurnoServlet extends HttpServlet {
         }
     }
 
+    //metodo auxiliar para verificar si límite turnos ha sido superado
     private boolean limiteTurnosSuperado(Long ciudadanoId) {
         int maxTurnosPendientes = 3;
         List<Turno> pendientes = turnoService.obtenerTodos().stream()

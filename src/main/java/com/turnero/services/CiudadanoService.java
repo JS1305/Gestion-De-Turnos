@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public class CiudadanoService {
 
-    // ---------------- Transacción genérica ----------------
+    //  Transacción genérica
     private <T> T ejecutarTransaccion(Function<EntityManager, T> operacion) {
         EntityManager em = JpaUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
@@ -28,7 +28,7 @@ public class CiudadanoService {
         }
     }
 
-    // ---------------- Consulta genérica ----------------
+    //  Consulta genérica
     private <T> List<T> ejecutarConsulta(String jpql, Class<T> clase) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
@@ -39,7 +39,7 @@ public class CiudadanoService {
         }
     }
 
-    // ---------------- Validación DNI ----------------
+    //  Validación DNI
     private boolean validarDni(String dni) {
         if (dni == null || !dni.matches("^[0-9]{8}[A-Za-z]$")) return false;
         String letras = "TRWAGMYFPDXBNJZSQVHLCKE";
@@ -48,7 +48,7 @@ public class CiudadanoService {
         return Character.toUpperCase(dni.charAt(8)) == letraCorrecta;
     }
 
-    // ---------------- CRUD ----------------
+    //CRUD
 
     public Ciudadano crearCiudadano(Ciudadano ciudadano) {
         if (!validarDni(ciudadano.getDni())) throw new IllegalArgumentException("DNI inválido");
