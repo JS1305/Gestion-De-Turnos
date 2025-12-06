@@ -18,91 +18,95 @@ import java.util.List;
 @WebServlet("/registrar-turno")
 public class CrearTurnoServlet extends HttpServlet {
 
-    private CiudadanoService ciudadanoService = new CiudadanoService();
-    private TurnoService turnoService = new TurnoService();
+    private final CiudadanoService ciudadanoService = new CiudadanoService();
+    private final TurnoService turnoService = new TurnoService();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            //  Obtener parámetros
             String estado = request.getParameter("estado");
             String descripcion = request.getParameter("descripcion");
             String fecha = request.getParameter("fecha");
             String ciudadanoIdStr = request.getParameter("ciudadano_id");
 
-            //  Validaciones básicas
+            // Validaciones básicas
             if (estado == null || estado.isBlank() ||
                     fecha == null || fecha.isBlank() ||
                     ciudadanoIdStr == null || ciudadanoIdStr.isBlank()) {
 
-                request.setAttribute("error", "Todos los campos son obligatorios.");
-                request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
+                mostrarError(request, response, "Todos los campos son obligatorios.");
                 return;
             }
 
-            Long ciudadanoId;
-            try {
-                ciudadanoId = Long.parseLong(ciudadanoIdStr);
-            } catch (NumberFormatException e) {
-                request.setAttribute("error", "Ciudadano inválido.");
-                request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
+            if (!validarCiudadanoId(ciudadanoIdStr)) {
+                mostrarError(request, response, "Ciudadano inválido.");
                 return;
             }
 
-            //  Validación de límite de turnos
-            int maxTurnosPendientes = 3;
-            List<Turno> pendientes = turnoService.obtenerTodos().stream()
-                    .filter(t -> t.getCiudadano().getId().equals(ciudadanoId))
-                    .filter(t -> t.getEstado().equals("En espera"))
-                    .toList();
+            Long ciudadanoId = Long.parseLong(ciudadanoIdStr);
 
-            if (pendientes.size() >= maxTurnosPendientes) {
-                request.setAttribute("error",
-                        "Máximo " + maxTurnosPendientes + " turnos en estado 'En espera' por ciudadano. " +
+            if (limiteTurnosSuperado(ciudadanoId)) {
+                mostrarError(request, response,
+                        "Máximo 3 turnos en estado 'En espera' por ciudadano. " +
                                 "Por favor, actualice estado de turnos actuales o espere a que sean resueltos.");
-                request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
                 return;
             }
 
-            //  Validación de fecha
             LocalDate fechaTurno;
             try {
-                fechaTurno = LocalDate.parse(fecha); // formato yyyy-MM-dd
+                fechaTurno = LocalDate.parse(fecha);
             } catch (DateTimeParseException e) {
-                request.setAttribute("error", "La fecha ingresada no es válida.");
-                request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
+                mostrarError(request, response, "La fecha ingresada no es válida.");
                 return;
             }
 
             if (fechaTurno.isBefore(LocalDate.now())) {
-                request.setAttribute("error", "La fecha no puede ser anterior a la actual.");
-                request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
+                mostrarError(request, response, "La fecha no puede ser anterior a la actual.");
                 return;
             }
 
-            //  Verificar existencia del ciudadano
             Ciudadano ciudadano = ciudadanoService.obtenerCiudadano(ciudadanoId);
             if (ciudadano == null) {
-                request.setAttribute("error", "El ciudadano seleccionado no existe.");
-                request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
+                mostrarError(request, response, "El ciudadano seleccionado no existe.");
                 return;
             }
 
-            //  Crear turno
+            // Crear turno
             int identificador = turnoService.generarNuevoIdentificador();
             Turno nuevoTurno = new Turno(identificador, estado, descripcion, fechaTurno.toString(), ciudadano);
             turnoService.crearTurno(nuevoTurno);
 
-            //  Redirigir con éxito
-            String contextPath = request.getContextPath();
-            response.sendRedirect(contextPath + "/form-turno?success=true&id=" + nuevoTurno.getId());
+            response.sendRedirect(request.getContextPath() + "/form-turno?success=true&id=" + nuevoTurno.getId());
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Error inesperado al registrar el turno: " + e.getMessage());
-            request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
+            mostrarError(request, response, "Error inesperado al registrar el turno: " + e.getMessage());
         }
+    }
+
+    private void mostrarError(HttpServletRequest request, HttpServletResponse response, String mensaje)
+            throws ServletException, IOException {
+        request.setAttribute("error", mensaje);
+        request.getRequestDispatcher("registroTurno.jsp").forward(request, response);
+    }
+
+    private boolean validarCiudadanoId(String ciudadanoIdStr) {
+        try {
+            Long.parseLong(ciudadanoIdStr);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean limiteTurnosSuperado(Long ciudadanoId) {
+        int maxTurnosPendientes = 3;
+        List<Turno> pendientes = turnoService.obtenerTodos().stream()
+                .filter(t -> t.getCiudadano().getId().equals(ciudadanoId))
+                .filter(t -> t.getEstado().equals("En espera"))
+                .toList();
+        return pendientes.size() >= maxTurnosPendientes;
     }
 }
