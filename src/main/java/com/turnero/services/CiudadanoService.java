@@ -7,100 +7,89 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
-
- //Servicio encargado de la lógica de negocio para la entidad Ciudadano.
- //Implementa operaciones CRUD usando JPA.
- // Mantiene la persistencia separada del Servlet para seguir buenas prácticas.
+import java.util.function.Function;
 
 public class CiudadanoService {
 
-     // Crea y persiste un nuevo ciudadano en la base de datos.
-    public Ciudadano crearCiudadano(Ciudadano ciudadano) {
-        // Obtener EntityManager (gestiona la conexión con la BD)
+    // ---------------- Transacción genérica ----------------
+    private <T> T ejecutarTransaccion(Function<EntityManager, T> operacion) {
         EntityManager em = JpaUtil.getEntityManager();
-        // Iniciar transacción
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
-            // Persistir el ciudadano en la BD
-            em.persist(ciudadano);
-            tx.commit(); // Confirmar la transacción
-            return ciudadano;
-        } catch (Exception e) {
-            // Si hay error, revertir cambios
+            T resultado = operacion.apply(em);
+            tx.commit();
+            return resultado;
+        } catch (RuntimeException e) {
             if (tx.isActive()) tx.rollback();
-            throw e; // Lanzar la excepción para que el servlet pueda manejarla
+            throw e;
         } finally {
-            em.close(); // Cerrar EntityManager para liberar recursos
+            em.close();
         }
     }
 
-     // Obtiene un ciudadano por su ID
+    // ---------------- Consulta genérica ----------------
+    private <T> List<T> ejecutarConsulta(String jpql, Class<T> clase) {
+        EntityManager em = JpaUtil.getEntityManager();
+        try {
+            TypedQuery<T> query = em.createQuery(jpql, clase);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    // ---------------- Validación DNI ----------------
+    private boolean validarDni(String dni) {
+        if (dni == null || !dni.matches("^[0-9]{8}[A-Za-z]$")) return false;
+        String letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+        int numero = Integer.parseInt(dni.substring(0, 8));
+        char letraCorrecta = letras.charAt(numero % 23);
+        return Character.toUpperCase(dni.charAt(8)) == letraCorrecta;
+    }
+
+    // ---------------- CRUD ----------------
+
+    public Ciudadano crearCiudadano(Ciudadano ciudadano) {
+        if (!validarDni(ciudadano.getDni())) throw new IllegalArgumentException("DNI inválido");
+        return ejecutarTransaccion(em -> {
+            em.persist(ciudadano);
+            return ciudadano;
+        });
+    }
+
     public Ciudadano obtenerCiudadano(Long id) {
         EntityManager em = JpaUtil.getEntityManager();
         try {
-            // find busca la entidad por su clave primaria
             return em.find(Ciudadano.class, id);
         } finally {
             em.close();
         }
     }
 
-     //Devuelve todos los ciudadanos de la base de datos
     public List<Ciudadano> obtenerTodos() {
-        EntityManager em = JpaUtil.getEntityManager();
-        try {
-            // JPQL: "SELECT c FROM Ciudadano c" obtiene todos los objetos Ciudadano
-            TypedQuery<Ciudadano> query = em.createQuery("SELECT c FROM Ciudadano c", Ciudadano.class);
-            return query.getResultList(); // Devuelve la lista de resultados
-        } finally {
-            em.close();
-        }
+        return ejecutarConsulta("SELECT c FROM Ciudadano c", Ciudadano.class);
     }
 
-     //Actualiza un ciudadano existente
     public Ciudadano actualizarCiudadano(Long id, Ciudadano actualizado) {
-        EntityManager em = JpaUtil.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            // Buscar el ciudadano existente
+        if (!validarDni(actualizado.getDni())) throw new IllegalArgumentException("DNI inválido");
+        return ejecutarTransaccion(em -> {
             Ciudadano ciudadano = em.find(Ciudadano.class, id);
             if (ciudadano == null) return null;
-
-            // Actualizar los campos
             ciudadano.setNombre(actualizado.getNombre());
             ciudadano.setDni(actualizado.getDni());
-
-            tx.commit();
             return ciudadano;
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
+        });
     }
 
-     //Elimina un ciudadano de la base de datos
     public boolean eliminarCiudadano(Long id) {
-        EntityManager em = JpaUtil.getEntityManager();
-        EntityTransaction tx = em.getTransaction();
-        try {
-            tx.begin();
-            // Buscar el ciudadano a eliminar
+        return ejecutarTransaccion(em -> {
             Ciudadano ciudadano = em.find(Ciudadano.class, id);
             if (ciudadano != null) {
-                em.remove(ciudadano); // Eliminar
-                tx.commit();
+                em.remove(ciudadano);
                 return true;
             }
-            return false; // No se encontró el ciudadano
-        } catch (Exception e) {
-            if (tx.isActive()) tx.rollback();
-            throw e;
-        } finally {
-            em.close();
-        }
+            return false;
+        });
     }
 }

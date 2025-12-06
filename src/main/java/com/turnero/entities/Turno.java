@@ -2,8 +2,6 @@ package com.turnero.entities;
 
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "turno")
@@ -41,10 +39,17 @@ public class Turno {
     public void setFecha(String fecha) { this.fecha = fecha; }
     public Ciudadano getCiudadano() { return ciudadano; }
     public void setCiudadano(Ciudadano ciudadano) { this.ciudadano = ciudadano; }
+
     @Override
     public String toString() {
-        return "Turno{id=" + id + ", identificador=" + identificador +
-                ", estado='" + estado + "', descripcion='" + descripcion +
-                "', fecha='" + fecha + "', ciudadano=" + (ciudadano != null ? ciudadano.getId() : null) + "}";
+        return "Turno{" +
+                "id=" + id +
+                ", identificador=" + identificador +
+                ", estado='" + estado + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", fecha='" + fecha + '\'' +
+                ", ciudadanoId=" + (ciudadano != null ? ciudadano.getId() : null) +
+                '}';
     }
+
 }
